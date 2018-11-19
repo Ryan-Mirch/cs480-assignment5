@@ -72,31 +72,51 @@ class ASRControl(object):
                     self.msg.linear.x = self.msg.linear.x*2
                     self.msg.angular.z = self.msg.angular.z*2
                     self.speed = 0.4
+
             if seg.word.find("half speed") > -1:
                 if self.speed == 0.4:
                     self.msg.linear.x = self.msg.linear.x/2
                     self.msg.angular.z = self.msg.angular.z/2
                     self.speed = 0.2
+
             if seg.word.find("forward") > -1:
                 self.msg.linear.x = self.speed
                 self.msg.angular.z = 0
-            elif seg.word.find("left") > -1:
+
+            elif seg.word.find("rotate left") > -1:
                 if self.msg.linear.x != 0:
                     if self.msg.angular.z < self.speed:
                         self.msg.angular.z += 0.05
                 else:
-                    self.msg.angular.z = self.speed*2
-            elif seg.word.find("right") > -1:
+                    self.msg.angular.z = self.speed*4
+
+            elif seg.word.find("rotate right") > -1:
                 if self.msg.linear.x != 0:
                     if self.msg.angular.z > -self.speed:
                         self.msg.angular.z -= 0.05
                 else:
-                    self.msg.angular.z = -self.speed*2
+                    self.msg.angular.z = -self.speed*4
+
+	    elif seg.word.find("bank right") > -1:
+		self.msg.linear.x = self.speed
+                if self.msg.angular.z > -self.speed:
+		    self.msg.angular.z = -self.speed*1.5
+
+	    elif seg.word.find("bank left") > -1:
+		self.msg.linear.x = self.speed
+                if self.msg.angular.z < self.speed:
+		    self.msg.angular.z = self.speed*1.5
+			
             elif seg.word.find("back") > -1:
                 self.msg.linear.x = -self.speed
                 self.msg.angular.z = 0
+
+
+
             elif seg.word.find("stop") > -1 or seg.word.find("halt") > -1:
                 self.msg = Twist()
+	
+
 
         self.pub_.publish(self.msg)
 
@@ -116,9 +136,9 @@ if __name__ == '__main__':
         help='''acoustic model path
         (default: /usr/share/pocketsphinx/model/hmm/en_US/hub4wsj_sc_8k)''')
     parser.add_argument('--lexicon', type=str,
-        default='voice_cmd.dic',
+        default='voice_cmd_2.dic',
         help='''pronunciation dictionary
-        (default: voice_cmd.dic)''')
+        (default: voice_cmd_2.dic)''')
     parser.add_argument('--kwlist', type=str,
         default='voice_cmd.kwlist',
         help='''keyword list with thresholds
